@@ -1,8 +1,17 @@
-libshell.o
-libshell.so
-libshell_s.a
-libtshell
+libbshell.o
+libbshell.so
+libbshell_s.a
+libbshell
 
 libtest.o
 libtest.so
 libtest
+
+runtime_test
+static_test
+
+*/*.pch
+
+bin/
+lib/
+obj/
