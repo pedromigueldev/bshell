@@ -18,6 +18,7 @@ BINS := $(BIN:%=$(BIN_DIR)/%)
 all: create_dirs $(OBJ) $(LIB) $(LIB_S) dynamic static
 dynamic: create_dirs $(OBJ) $(LIB) dynamic_lib_test
 static: create_dirs $(OBJ) $(LIB_S) static_lib_test
+lib: create_dirs $(OBJ) $(LIB) $(LIB_S)
 
 static_lib_test: libtest.c $(LIB_DIR)/$(NAME)_s.a
 	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^ -L -libbshell_s
