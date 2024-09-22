@@ -1,0 +1,8 @@
+libshell.o
+libshell.so
+libshell_s.a
+libtshell
+
+libtest.o
+libtest.so
+libtest
