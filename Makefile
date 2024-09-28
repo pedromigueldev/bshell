@@ -15,7 +15,7 @@ LIB := $(LIB_DIR)/$(NAME).so
 LIB_S := $(LIB_DIR)/$(NAME)_s.a
 BINS := $(BIN:%=$(BIN_DIR)/%)
 
-all: create_dirs $(OBJ) $(LIB) $(LIB_S)
+all: create_dirs $(OBJ) $(LIB) $(LIB_S) static
 dynamic: create_dirs $(OBJ) $(LIB) dynamic_lib_test
 static: create_dirs $(OBJ) $(LIB_S) static_lib_test
 lib: create_dirs $(OBJ) $(LIB) $(LIB_S)

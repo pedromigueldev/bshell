@@ -1,5 +1,4 @@
 #include "libbshell.h"
-#include <complex.h>
 #include <stdio.h>
 
 ConfigStruct default_config = {
@@ -16,7 +15,14 @@ int shell_num_builtins()
         return 0;
     }
 
-  return sizeof(shell_bultin_named_functions) / sizeof(char *);
+    int i = 0;
+    for (;; i++) {
+        if (shell_bultin_named_functions[i] == NULL) {
+            return i;
+        }
+    }
+
+  // return sizeof(shell_bultin_named_functions) / sizeof(char *);
 }
 
 int set_config_struct(ConfigStruct config)
@@ -34,7 +40,7 @@ int _execute(char** args)
 
     for (int i = 0; i < shell_num_builtins(); i++)
     {
-        // printf("Comparing %s with %s\n", args[0], shell_bultin_named_functions[i]);
+        // printf("Comparing %s with %s: theres %d args\n", args[0], shell_bultin_named_functions[i], shell_num_builtins());
         if (strcmp(args[0], shell_bultin_named_functions[i]) == 0)
         {
             return (*shell_bultin_functions[i])(args);
@@ -45,6 +51,15 @@ int _execute(char** args)
     return 1;
 }
 
+int _exit_shell (char** arg) {
+    for (int i = 0; i < shell_num_builtins(); i++) {
+        free(shell_bultin_named_functions[i]);
+    }
+    free(shell_bultin_functions);
+    free(shell_bultin_named_functions);
+    return 0;
+}
+
 int add_extra_function(char* name, int (*function)(char**)){
     int count = shell_num_builtins();
     int amount = count + 1;
@@ -52,21 +67,18 @@ int add_extra_function(char* name, int (*function)(char**)){
     if (shell_bultin_functions == NULL || shell_bultin_named_functions == NULL) {
         shell_bultin_functions = malloc(amount * sizeof(int (*)(char**)));
         shell_bultin_named_functions = malloc(amount * sizeof(char*));
+    } else {
+        shell_bultin_functions = realloc(shell_bultin_functions, (amount + 1) * sizeof(int (*)(char**)));
+        shell_bultin_named_functions = realloc(shell_bultin_named_functions, (amount + 1) * sizeof(char*));
+
+        if (shell_bultin_functions == NULL || shell_bultin_named_functions == NULL) {
+            fprintf(stderr,"Unable to grow token size");
+            exit(EXIT_FAILURE);
+        }
     }
 
-    int (**old_functions)(char**) = malloc(amount * sizeof(int (*)(char**)));
-    char** old_named_functions = malloc(amount * sizeof(char*));
-
-    for (int i = 0; i < count; i++) {
-        old_functions[i] = shell_bultin_functions[i];
-        old_named_functions[i] = shell_bultin_named_functions[i];
-    }
-
-    old_named_functions[count] = strdup(name);
-    old_functions[count] = function;
-
-    shell_bultin_functions = old_functions;
-    shell_bultin_named_functions = old_named_functions;
+    shell_bultin_named_functions[count] = strdup(name);
+    shell_bultin_functions[count] = function;
     return 1;
 }
 
@@ -79,10 +91,7 @@ int shell_main(ConfigStruct* config){
         default_config = *config;
     }
 
-    if (shell_bultin_functions == NULL || shell_bultin_named_functions == NULL) {
-        perror("Add a function to the shell before initializing");
-        exit(EXIT_FAILURE);
-    }
+    add_extra_function("exit", _exit_shell);
 
     printf("%s\n", default_config.wellcome_message);
     do {
@@ -93,7 +102,7 @@ int shell_main(ConfigStruct* config){
         status = _execute (args);
     } while (status);
 
-    free(config);
+    free(args);
     free(line);
     return status;
 }
