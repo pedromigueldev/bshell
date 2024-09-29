@@ -6,17 +6,13 @@
 #include "stdlib.h"
 
 typedef struct {
-    char* name;
-    int (*extra_function)(char**);
-} ExtraFunction;
-
-typedef struct {
     char* wellcome_message;
     char* prompt;
+    int (*add_extra_f)(char* name, int (*)(char**));
 } ConfigStruct;
 
-int shell_main(ConfigStruct* config);
-int print_funtion_list();
+ConfigStruct bshell_config_init();
+int shell_main(ConfigStruct config);
 int add_extra_function(char* name, int (*function)(char**));
 
 #endif

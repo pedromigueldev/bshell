@@ -2,29 +2,35 @@ SRC_DIR := src
 OBJ_DIR := obj
 LIB_DIR := lib
 BIN_DIR := bin
+TEST_DIR := test
 
 NAME=libbshell
 CC=clang
 CFLAGS=-g -Wall
-BIN=static_lib_test dynamic_lib_test
 
 SRC := $(wildcard $(SRC_DIR)/*.c)
 INCL := $(wildcard $(SRC_DIR)/*.h)
 OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 LIB := $(LIB_DIR)/$(NAME).so
 LIB_S := $(LIB_DIR)/$(NAME)_s.a
-BINS := $(BIN:%=$(BIN_DIR)/%)
+TESTS := $(wildcard $(TEST_DIR)/*.c)
+TESTS_BIN := $(TESTS:$(TEST_DIR)/%.c=$(TEST_DIR)/bin/%)
 
-all: create_dirs $(OBJ) $(LIB) $(LIB_S) static
-dynamic: create_dirs $(OBJ) $(LIB) dynamic_lib_test
-static: create_dirs $(OBJ) $(LIB_S) static_lib_test
+all: lib test
+
+run: clean lib test link_s
+	./$(BIN_DIR)/link_s
+
 lib: create_dirs $(OBJ) $(LIB) $(LIB_S)
 
-static_lib_test: libtest.c $(LIB_DIR)/$(NAME)_s.a
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^ -L -libbshell_s
+test: $(TESTS_BIN)
+	for test in $(TESTS_BIN) ; do ./$$test ; done
 
-dynamic_lib_test: libtest.c $(LIB_DIR)/$(NAME).so
-	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^ -L -libbshell
+link_s: main.c $(LIB_S)
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^ -L -lbshell_s
+
+link_d: main.c $(LIB)
+	$(CC) $(CFLAGS) -o $(BIN_DIR)/$@ $^ -L -lbshell
 
 %.so: $(SRC)
 	$(CC) $(CFLAGS) -fPIC -shared -o $@ $^ -lc
@@ -36,8 +42,11 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(SRC_DIR)/%.h
 	$(CC) $(CFLAGS) -c $^
 	mv *.o $(OBJ_DIR)
 
+$(TEST_DIR)/bin/%: $(TEST_DIR)/%.c $(LIB_DIR)/$(NAME)_s.a
+	$(CC) $(CFLAGS) -o $@ $^ -L -lbshell -lcriterion
+
 create_dirs:
-	mkdir -p $(OBJ_DIR) $(LIB_DIR) $(BIN_DIR)
+	mkdir -p $(OBJ_DIR) $(LIB_DIR) $(BIN_DIR) $(TEST_DIR)/bin
 
 clean:
-	$(RM) -r $(OBJ_DIR) $(LIB_DIR) $(BIN_DIR) */*.pch
+	$(RM) -r $(OBJ_DIR) $(LIB_DIR) $(BIN_DIR) $(TEST_DIR)/bin */*.pch
