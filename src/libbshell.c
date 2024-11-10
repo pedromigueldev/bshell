@@ -1,5 +1,6 @@
 #include "libbshell.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 ///* INTERNAL FUNCTIONS */ ------------------------------------------------------------------
 static ConfigStruct default_config = {
@@ -75,8 +76,8 @@ int add_extra_function(char* name, int (*function)(char**)){
     int amount = count + 1;
 
     if (_bshell_functions == NULL || _bshell_functions_names == NULL) {
-        _bshell_functions = malloc(amount * sizeof(int (*)(char**)));
-        _bshell_functions_names = malloc(amount * sizeof(char*));
+        _bshell_functions = calloc(amount, sizeof(int (*)(char**)));
+        _bshell_functions_names = calloc(amount, sizeof(char*));
 
         if (_bshell_functions == NULL || _bshell_functions_names == NULL) {
             fprintf(stderr,"Unable to create memory for shell.\n");

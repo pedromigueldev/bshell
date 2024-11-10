@@ -5,7 +5,7 @@ BIN_DIR := bin
 TEST_DIR := test
 
 NAME=libbshell
-CC=clang
+CC=gcc
 CFLAGS=-g -Wall
 
 SRC := $(wildcard $(SRC_DIR)/*.c)
