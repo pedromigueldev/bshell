@@ -20,8 +20,6 @@ Test(add_extra_function, adding) {
     ConfigStruct config_struct = bshell_config_init();
 
     cr_expect(config_struct.add_extra_f("print1", &print1) == 1, "It should return 1 if addded successfully in the array.");
-
     cr_expect(config_struct.add_extra_f("print2", &print2) == 1, "It should return 1 if addded successfully in the array.");
-
     cr_expect(config_struct.add_extra_f("print2", &print2) == 1, "It should return 1 if addded successfully in the array.");
 }

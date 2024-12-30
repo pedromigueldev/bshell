@@ -11,5 +11,5 @@ int main() {
     config_struct.prompt = "HELLOS: ";
     config_struct.add_extra_f("print1", &print1);
 
-    return shell_main(config_struct);;
+    return bshell_main(config_struct);
 }

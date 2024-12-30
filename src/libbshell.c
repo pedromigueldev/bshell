@@ -5,6 +5,7 @@
 ///* INTERNAL FUNCTIONS */ ------------------------------------------------------------------
 static ConfigStruct default_config = {
     .wellcome_message = "Welcome to the shell",
+    .help_message = "The available functions are",
     .prompt = "bshell> "
 };
 
@@ -43,8 +44,7 @@ static int _execute(char** args)
         }
 
     }
-    printf("Funtion not found!\n");
-    printf("The available functions are: \n");
+    printf("%s\n", default_config.help_message);
     for (int i = 0; i < _bshell_num_builtins(); i++)
     {
         printf("%s\n", _bshell_functions_names[i]);
@@ -100,7 +100,7 @@ int add_extra_function(char* name, int (*function)(char**)){
     return 1;
 }
 
-int shell_main(ConfigStruct config){
+int bshell_main(ConfigStruct config){
     char* line;
     char** args;
     int status = 1;
@@ -108,11 +108,12 @@ int shell_main(ConfigStruct config){
     if (config.add_extra_f == NULL) {
         fprintf(stderr, "Config is not initialized.\n");
     }
+
     if (config.prompt && config.wellcome_message) {
         default_config = config;
     }
 
-    add_extra_function("exit", _bshell_exit);
+    add_extra_function("Sair", _bshell_exit);
 
     printf("%s\n", default_config.wellcome_message);
     do {
